@@ -118,8 +118,8 @@ class LongBench(datasets.GeneratorBasedBuilder):
         with open(filepath, encoding="utf-8") as f:
             for idx, line in enumerate(f):
                 
-                # if idx > 10:
-                #     break
+                if idx > 10:
+                    break
 
                 key = f"{self.config.name}-{idx}"
                 item = json.loads(line)
