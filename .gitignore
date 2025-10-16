@@ -1,6 +1,6 @@
 .vscode
-test/__pycache__
-test/kvcache
+example/__pycache__
+example/kvcache
 tmp
 draw/qkv_3d_plots
 draw/diff_3d_plots

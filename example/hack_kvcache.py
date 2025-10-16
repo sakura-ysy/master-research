@@ -25,7 +25,7 @@ def parse_args(args=None):
     parser.add_argument('--dataset', type=str.lower, nargs='+', default=["2wikimqa"], help="Specify one or more datasets to evaluate")
     parser.add_argument('--world_size', type=check_world_size, default=torch.cuda.device_count(), help="Number of GPUs to use, must be 1 or a multiple of 2")
     parser.add_argument('--long_bench_ds_path', type=str, default="THUDM/LongBench", help="Path to the LongBench dataset if you have it locally")
-    parser.add_argument('--e', action='store_true', help="Evaluate on LongBench-E")
+    parser.add_argument('--dump_qkv', action='store_true', help="Whether to dump kv cache")
     return parser.parse_args(args)
 
 # This is the customized building prompt for chat models
@@ -164,7 +164,7 @@ def load_model_and_tokenizer(path, model_name, device):
 if __name__ == '__main__':
     seed_everything(42)
     args = parse_args()
-    world_size = args.world_size
+    
     mp.set_start_method('spawn', force=True)
 
     model2path = json.load(open("config/model2path.json", "r"))
