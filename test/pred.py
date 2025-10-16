@@ -20,8 +20,8 @@ def check_world_size(v: str) -> int:
 
 def parse_args(args=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str.lower, default=None, choices=["llama2-7b-chat-4k", "meta-llama-3-8b-instruct", "meta-llama-3.1-8b-instruct", "longchat-v1.5-7b-32k", "xgen-7b-8k", "internlm-7b-8k", "chatglm2-6b", "chatglm2-6b-32k", "chatglm3-6b-32k", "vicuna-v1.5-7b-16k"])
-    parser.add_argument('--dataset', type=str.lower, nargs='+', default=["2wikimqa"], choices=["2wikimqa", "narrativeqa", "qasper", "multifieldqa_en", "multifieldqa_zh", "hotpotqa", "musique", "dureader", "gov_report", "qmsum", "multi_news", "vcsum", "trec", "triviaqa", "samsum", "lsht", "passage_count", "passage_retrieval_en", "passage_retrieval_zh", "lcc", "repobench-p"], help="Specify one or more datasets to evaluate")
+    parser.add_argument('--model', type=str.lower, default=None)
+    parser.add_argument('--dataset', type=str.lower, nargs='+', default=["2wikimqa"], help="Specify one or more datasets to evaluate")
     parser.add_argument('--world_size', type=check_world_size, default=torch.cuda.device_count(), help="Number of GPUs to use, must be 1 or a multiple of 2")
     parser.add_argument('--long_bench_ds_path', type=str, default="THUDM/LongBench", help="Path to the LongBench dataset if you have it locally")
     parser.add_argument('--e', action='store_true', help="Evaluate on LongBench-E")
@@ -136,6 +136,9 @@ def load_model_and_tokenizer(path, model_name, device):
         model = model.to(device)
         model = model.bfloat16()
         tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
+    elif "qwen" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(device)
     model = model.eval()
     return model, tokenizer
 

@@ -1,0 +1,101 @@
+{"pred": "m_Initiator = initiator;", "answers": ["\t\t\t\tParticipant p = (Participant)m_Participants[i];"], "all_classes": null, "length": 5243}
+{"pred": "Z_.add_edge(e_u, e_v, **data.copy())", "answers": ["\t\t\tZ_.add_edge(e_u, e_v, **data.copy())"], "all_classes": null, "length": 1069}
+{"pred": "from audiolab import Sndfile, Format, available_encodings, available_file_formats", "answers": ["        rfd, fd, cfilename   = open_tmp_file('rwseektest.wav')"], "all_classes": null, "length": 844}
+{"pred": "self.open_video_page(video_id=\"abc123\")", "answers": ["            if e.text == language:"], "all_classes": null, "length": 462}
+{"pred": "xstream.aliasField(\"value\", OLStyleValue.class, \"value\");", "answers": ["\t\t\t\t\tOLStyleValue styleValue = (OLStyleValue) value;"], "all_classes": null, "length": 570}
+{"pred": "class _QuestionData(_QAData):", "answers": ["        longest = max(self.answers)"], "all_classes": null, "length": 1229}
+{"pred": "case 3:", "answers": ["                    mob.Target = new SR_NewRuneTarget(RuneAcc);"], "all_classes": null, "length": 907}
+{"pred": "@Override\nint messageLength() {", "answers": ["            for (int i = 0; i < chain.length; i++)"], "all_classes": null, "length": 1820}
+{"pred": "spaceRegistrar.put(name, this);", "answers": ["            sp = new JESpace(name, path);"], "all_classes": null, "length": 1096}
+{"pred": "private static final int BTN_WIDTH = 120;", "answers": ["\t\t\t\t\tpos = btnEnergizeAll.bottom();"], "all_classes": null, "length": 567}
+{"pred": "class SOAPHandler(BaseHTTPRequestHandler):", "answers": ["        length = int(environ['CONTENT_LENGTH'])"], "all_classes": null, "length": 1670}
+{"pred": "self.webview.execute_javascript(\"setRepeated('%s');\" % status_id)", "answers": ["        mark = \"setRepeated('%s');\" % status_id"], "all_classes": null, "length": 686}
+{"pred": "self.action_create_archive(login=\"admin\", password=\"password123\", status_id=\"status123\", params={\"source_path\": \"/path/to/source\", \"destination_path\": \"/path/to/destination\", \"archive_name\": \"archive.zip\"})", "answers": ["            return {\"error\": False}"], "all_classes": null, "length": 958}
+{"pred": "ZoneIdentityPermission zip = new ZoneIdentityPermission (SecurityZone.Untrusted);", "answers": ["\t\t\tIPermission result = a.Union (b);"], "all_classes": null, "length": 778}
+{"pred": "Security.addProvider(BouncyCastleProvider())", "answers": ["        certs = []"], "all_classes": null, "length": 713}
+{"pred": "request.setAttribute(\"domainInfo\", manager.getDomainInfo(domain));", "answers": ["        User user = getUser(request);"], "all_classes": null, "length": 847}
+{"pred": "self.__datastream_address = os.path.join(self.__tmp_dir, \"datastream\")", "answers": ["            self.__tmp_dir, 'datastream.%s.pipe' % uuid.uuid4().hex)"], "all_classes": null, "length": 1276}
+{"pred": "store.AppendValues ( \"\", \"\", \"\", \"\", \"\", \"\", true, \"\", false, \"\");", "answers": ["\t\t\t\tif(! option1) {"], "all_classes": null, "length": 957}
+{"pred": "String[] argValues = new String[args.length];", "answers": ["        if ((args == null) || (args.length == 0)) {"], "all_classes": null, "length": 1570}
+{"pred": "public static void loadToData()", "answers": ["\t\t\t\tfirms = loadFromFile();"], "all_classes": null, "length": 515}
+{"pred": "mgr.addPreferenceNode(playbackNode);", "answers": ["\t\tPreferencePage generalPage = new FieldEditorPreferencePage() {"], "all_classes": null, "length": 925}
+{"pred": "FinishSequence();", "answers": ["                if (m_Owner.SpellTarget == null)"], "all_classes": null, "length": 538}
+{"pred": "self._flushing = True", "answers": ["        for state, dict_ in states.items():"], "all_classes": null, "length": 4268}
+{"pred": "final Map<IField, String> field2Name = new LinkedHashMap<IField, String>();", "answers": ["\t\tfor(IField field : fields) { "], "all_classes": null, "length": 1985}
+{"pred": "class MainHandler(tornado.web.RequestHandler):\n    @asynchronous\n    def get(self):\n        self.write(\"Hello, world\")", "answers": ["    like ``r'/foo/?'`` in conjunction with using the decorator."], "all_classes": null, "length": 6502}
+{"pred": "base.Render (writer);", "answers": ["\t\t\tif ((Controls.Count == 0) && (initialIndex != -1)) "], "all_classes": null, "length": 777}
+{"pred": "parser.add_argument( '--latmin', help='Minimum latitude', type=float, default=47.95 )", "answers": ["    args = parser.parse_args()"], "all_classes": null, "length": 1225}
+{"pred": "AddHtmlLocalized(10, 13, 520, 18, 1079717, LabelColor, false, false);", "answers": ["                if (mod >= 156 && mod <= 160)"], "all_classes": null, "length": 1845}
+{"pred": "builds.append({'os': 'os_windows', 'os_pretty': 'Windows', 'download_link': make_download_link('firefox', build, version, 'os_windows', locale, force_direct=force_direct, force_full_installer=force_full_installer, force_funnelcake=force_funnelcake,", "answers": ["        for plat_os in ['Windows', 'Linux', 'Linux 64', 'OS X']:"], "all_classes": null, "length": 816}
+{"pred": "if (projectID!= null && issueTypeID!= null) {", "answers": ["\t\tif (projectID==null || issueTypeID==null) {"], "all_classes": null, "length": 1101}
+{"pred": "return GetConverter<AutoitScriptRoot>().Convert( node, ContextService );", "answers": ["            foreach (ArgumentSyntax argumentSyntax in argumentSyntaxs) {"], "all_classes": null, "length": 861}
+{"pred": "self._update_partition_id(1)", "answers": ["        split_test = self._update_partition_id(0)"], "all_classes": null, "length": 2752}
+{"pred": "internal override void WriteFont(PdfWriter writer, PdfIndirectReference piref, Object[] parms)", "answers": ["            foreach (object o in longTag.Values) {"], "all_classes": null, "length": 1490}
+{"pred": "for(Iterator<Cell> cIt = lib.getCells(); cIt.hasNext(); )", "answers": ["\t\t\t\t\t\tGraphNode cgn = graphNodes.get(cell);"], "all_classes": null, "length": 1113}
+{"pred": "private Bitmap loadPage() throws IOException {", "answers": ["        task = new ListenableFutureTask<>(callable);"], "all_classes": null, "length": 629}
+{"pred": "cmdHistory.goDown();", "answers": ["                else if (ke.getKeyCode() == KeyEvent.VK_DOWN) {"], "all_classes": null, "length": 1035}
+{"pred": "class NodeManagePoliciesForm(NodeView):", "answers": ["    prerequisite = NavigateToSibling('Details')"], "all_classes": null, "length": 534}
+{"pred": "public void notifyRecognitionListeners(BigInteger timestamp, LabanSequenceVector sequences) {", "answers": ["\t\tfor (IJRecognitionListener listener : recognitionListeners) {"], "all_classes": null, "length": 482}
+{"pred": "base.Render(writer);", "answers": ["                ScriptManager sm = ScriptManager.GetCurrent(Page);"], "all_classes": null, "length": 655}
+{"pred": "private void readFromNBT(NBTTagCompound compound)", "answers": ["\t\tdamageCooldown = compound.getInteger(\"DamageCooldown\");"], "all_classes": null, "length": 475}
+{"pred": "public Effect(Effect template) {", "answers": ["        StringBuilder sb = new StringBuilder(32);"], "all_classes": null, "length": 661}
+{"pred": "t = store.store.tokens.create({'username': 'test', 'groups': ['private'], 'write': True,'read': False})", "answers": ["    i = store.handle_indicators_create(t, {"], "all_classes": null, "length": 577}
+{"pred": "class DeltaTest(unittest.TestCase):", "answers": ["        p = Person.objects.get(name=\"owner\")"], "all_classes": null, "length": 701}
+{"pred": "self.locations(color=\"blue\")", "answers": ["                    interact(self._plot_line, x_name=widget_x, y_name=widget_y)"], "all_classes": null, "length": 1433}
+{"pred": "foreach (var pair in pairs)", "answers": ["                if (!ShouldIgnoreChange(path, ignored))"], "all_classes": null, "length": 513}
+{"pred": "private I transform(BiFunction<? super K,? super E,? extends E> function) {", "answers": ["\t\treturn read(key, computed);"], "all_classes": null, "length": 837}
+{"pred": "if len(resbrains) == 1:", "answers": ["        cat = getToolByName(self.context, 'uid_catalog')"], "all_classes": null, "length": 1519}
+{"pred": "public Tile[][][] ReadStaticBlock( int x, int y )", "answers": ["\t\t\tset { m_ID = (ushort)value; }"], "all_classes": null, "length": 1528}
+{"pred": "m_log.DebugFormat(\"[FreeSwitchVoice][PARCELVOICE]: region \\\"{0}\\\": Parcel \\\"{1}\\\" ({2}): avatar \\\"{3}\\\": request: {4}, path: {5}, param: {6}\", scene.RegionInfo.RegionName, land.Name, land.LocalID, avatarName, request, path", "answers": ["                    channelUri = ChannelUri(scene, land);"], "all_classes": null, "length": 1661}
+{"pred": "MessageBox.Show(\"Please fill in all required fields.\", \"Error\", MessageBoxButtons.OK, MessageBoxIcon.Error);", "answers": ["\t\t\t\tMsgBox.Show(this,\"Please fix data entry errors first.\");"], "all_classes": null, "length": 576}
+{"pred": "lat, lon = _build_lat_lon_for_NAME_field(header)", "answers": ["        lat, lon = _build_lat_lon_for_NAME_timeseries(column_headings)"], "all_classes": null, "length": 2765}
+{"pred": "return {'success': True}", "answers": ["    group_id = data_dict['id']"], "all_classes": null, "length": 772}
+{"pred": "// retrieving the child node corresponding to the classification outcome of the current example", "answers": ["\t\t\t\tString label = example.getValueAsString(predictionAttribute);"], "all_classes": null, "length": 784}
+{"pred": "return new[] { new SearchResult { MatchFound = false } };", "answers": ["            var searchResultsArray = new SearchResults[segments.Length];"], "all_classes": null, "length": 1172}
+{"pred": "RegexpNode createRange(Regcomp parser, int start, int end) {", "answers": ["            char low = string.charAt(offset++);"], "all_classes": null, "length": 6474}
+{"pred": "private static ValidationResults matchExistingStudyFormName(String accessionNumber, String studyFormName, boolean existingRequired) {", "answers": ["        if (GenericValidator.isBlankOrNull(studyFormName)) {"], "all_classes": null, "length": 945}
+{"pred": "if (handshake.Password!= Settings.Password)", "answers": ["\t\t\t\t\tSendOrderTo(newConn, \"AuthenticationError\", message);"], "all_classes": null, "length": 807}
+{"pred": "public boolean add(CatsReferralPendingEmergencyNonEDAdmissionListVo value)", "answers": ["\t\tif(beans == null)"], "all_classes": null, "length": 833}
+{"pred": "elif prnum == 'advanced':", "answers": ["elif prnum == 'advanced':"], "all_classes": null, "length": 549}
+{"pred": "A.GetValueSeq(seqindex, ref ret);", "answers": ["            int [] ret = new int[A.Dimensions.NumberOfDimensions]; "], "all_classes": null, "length": 1174}
+{"pred": "try:", "answers": ["  reportName = pD[ 'plotName' ]"], "all_classes": null, "length": 1147}
+{"pred": "foreach (var builder in builders) builder.SetRallyPoints(bot);", "answers": ["\t\t\tforeach (var rp in world.ActorsWithTrait<RallyPoint>())"], "all_classes": null, "length": 985}
+{"pred": "catalog.execute(\"add / clusters cluster\");", "answers": ["        List<PlanNodeList> nodeLists = new ArrayList<PlanNodeList>();"], "all_classes": null, "length": 768}
+{"pred": "this.comboBox1.SelectedIndex = 0;", "answers": ["\t\t\tthis.comboBox1.Size = new System.Drawing.Size(224, 21);"], "all_classes": null, "length": 1012}
+{"pred": "dcb.BaudRate = baud_rate;", "answers": ["\t\t\tdcb.SetValues (baud_rate, parity, data_bits, bits, hs);"], "all_classes": null, "length": 1031}
+{"pred": "self.check_can_see_edit_page(self.user, True)", "answers": ["        page = self.get_page(self.user.get_profile().get_url(),"], "all_classes": null, "length": 840}
+{"pred": "if __name__ == '__main__':", "answers": ["    options, args = parser.parse_known_args()"], "all_classes": null, "length": 555}
+{"pred": "self[\"info\"].setText(_(\"Scanning for access points...\"))", "answers": ["\t\t\tcurrentListEntry = self[\"list\"].getCurrent()"], "all_classes": null, "length": 1024}
+{"pred": "public override Rectangle BarcodeSize { get { return new Rectangle(fontX + 10, fontY + barHeight * (text.Length * 10 - 1) + 10, fontX + 10, fontY + barHeight * (text.Length * 10 - 1) + 10); }", "answers": ["                int len = fCode.Length + 2;"], "all_classes": null, "length": 1163}
+{"pred": "public static String[] getStringArray(Properties props, String key) {", "answers": ["    if (results == null) {"], "all_classes": null, "length": 840}
+{"pred": "import iris.tests.stock as istk", "answers": ["        y_points = np.arange(-89.12, +90.0, 42.847)"], "all_classes": null, "length": 819}
+{"pred": "Clipboard.SetText(currPacket.Frame.ToString());", "answers": ["            if (currPacket != null)"], "all_classes": null, "length": 518}
+{"pred": "print_color(color=\"red\")", "answers": ["    elif color == 'yellow':"], "all_classes": null, "length": 1319}
+{"pred": "public virtual bool Remove(TK key)", "answers": ["            set { _numValues = value; }"], "all_classes": null, "length": 743}
+{"pred": "this.treeView1.Nodes[0].Expand();", "answers": ["            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);"], "all_classes": null, "length": 1467}
+{"pred": "class _NullFunctionPointer( object ):", "answers": ["        elif hasattr( original, 'originalFunction' ):"], "all_classes": null, "length": 831}
+{"pred": "private void writeFilesInfo(final DataOutput header) throws IOException {", "answers": ["            final DataOutputStream out = new DataOutputStream(baos);"], "all_classes": null, "length": 1652}
+{"pred": "alphaLevel = rampUp? Math.min(alphaLevel + 1, 255) : Math.max(alphaLevel - 1, 0);", "answers": ["                    for (int i = 0; i < ticker.length; i++)"], "all_classes": null, "length": 600}
+{"pred": "PrepareClientToReturnCompletedItem(true, ratio: 1.0);", "answers": ["            var item = Subject.GetItems().Single();"], "all_classes": null, "length": 655}
+{"pred": "await session.Inventory.RefreshCachedInventory();", "answers": ["                if (_diff > 0)"], "all_classes": null, "length": 772}
+{"pred": "f.writelines(['F) ', str(NXPTS), '\t\t# Number of x pixels in the','image\\n'])", "answers": ["                      'relative to data\\n'])"], "all_classes": null, "length": 1863}
+{"pred": "public static sega_decryptPtr sega_decrypt76 = new sega_decryptPtr() {", "answers": ["                    i += ((b & 0x08) << 2);"], "all_classes": null, "length": 1309}
+{"pred": "self._course_key = CourseKey.from_string(f\"{self._course_dict['org']}/{self._course_dict['number']}/{self._course_dict['run']}\")", "answers": ["        course_key = CourseKey.from_string(self._course_key)"], "all_classes": null, "length": 824}
+{"pred": "if (currentSafariMobsKilled == currentSafariMobsToKill) {", "answers": ["\t\tint min = -1;"], "all_classes": null, "length": 803}
+{"pred": "def download_request(module, name, apiid, apikey, cert_type):", "answers": ["        types = ['cert', 'key']"], "all_classes": null, "length": 744}
+{"pred": "this.chkPrivacy.CheckedChanged += new System.EventHandler(this.chkPrivacy_CheckedChanged);", "answers": ["            this.lblPrivacy.Location = new System.Drawing.Point(6, 26);"], "all_classes": null, "length": 1336}
+{"pred": "self.prework()", "answers": ["        for i in zip(self.loaded_plugins):"], "all_classes": null, "length": 3043}
+{"pred": "class IEventFossil(IFossil):", "answers": ["    getRoomFullName.produce = lambda s: s.getRoom()"], "all_classes": null, "length": 893}
+{"pred": "importMessages();", "answers": ["                            throw new MessageWriterException(e);"], "all_classes": null, "length": 543}
+{"pred": "if (value instanceof Number) {", "answers": ["\t\t       \t\t\tlayer = ScriptRuntime.toInt32(value);"], "all_classes": null, "length": 762}
+{"pred": "if (currentSession!= null) {", "answers": ["        if (currentSession != null && currentSession.isOpened()) {"], "all_classes": null, "length": 1328}
+{"pred": "for (Emotion emotion : emotions) sum += emotion.chance;", "answers": ["\t\tfor(Emotion emotion : emotions)"], "all_classes": null, "length": 630}
+{"pred": "self.build.add_stage(stage)", "answers": ["                    'property1': 2, 'property2': 3}"], "all_classes": null, "length": 1160}
+{"pred": "phi1 = phi1Rad * _rad2deg", "answers": ["    N1 = a/sqrt(1-eccSquared*sin(phi1Rad)*sin(phi1Rad))"], "all_classes": null, "length": 980}
+{"pred": "if request.method == 'POST':", "answers": ["        form = ReportUserForm(request.POST)"], "all_classes": null, "length": 651}
+{"pred": "class ProductAddSeriesView(LaunchpadFormView):", "answers": ["    field_names = ['name', 'summary', 'branch', 'releasefileglob']"], "all_classes": null, "length": 4413}
+{"pred": "using System;", "answers": ["\t\t\t\ttry { RtlApplyToControls(form.Controls); }"], "all_classes": null, "length": 511}
+{"pred": "temp >>= 8;", "answers": ["                temp >>= 8;"], "all_classes": null, "length": 917}
+{"pred": "def initialize_config(parser):", "answers": ["                if flag == 'exclude_tags':"], "all_classes": null, "length": 1382}
+{"pred": "public override object[] GetCustomAttributes(Type attributeType, bool inherit)", "answers": ["                return new object[0];"], "all_classes": null, "length": 545}
+{"pred": "class OBD_PID1D(OBD_Packet):", "answers": ["        0x06: 'EOBD (Europe) ',"], "all_classes": null, "length": 557}

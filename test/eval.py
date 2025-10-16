@@ -37,6 +37,7 @@ dataset2metric = {
     "passage_retrieval_zh": retrieval_zh_score,
     "lcc": code_sim_score,
     "repobench-p": code_sim_score,
+    "evol-instruct-python-1k": qa_f1_score,
 }
 
 def parse_args(args=None):

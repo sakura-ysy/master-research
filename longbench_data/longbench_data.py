@@ -53,14 +53,15 @@ task_list = [
     "hotpotqa_e",
     "2wikimqa_e",
     "gov_report_e",
-    "multi_news_e",
+    "multi_news_e", 
     "trec_e",
     "triviaqa_e",
     "samsum_e",
     "passage_count_e",
     "passage_retrieval_en_e",
     "lcc_e",
-    "repobench-p_e"
+    "repobench-p_e",
+    "evol-instruct-python-1k"
 ]
 
 
@@ -99,7 +100,7 @@ class LongBench(datasets.GeneratorBasedBuilder):
     def _split_generators(self, dl_manager):
         # data_dir = dl_manager.download_and_extract(_URL)
         # data_dir = os.path.dirname(__file__)
-        data_dir = "/home/ysy/data/LongBench"
+        data_dir = "/home/ysy/code/research/longbench_data"
         task_name = self.config.name
         print(os.path.join(data_dir, "data", f"{task_name}.jsonl"))
         return [
@@ -124,12 +125,12 @@ class LongBench(datasets.GeneratorBasedBuilder):
                 key = f"{self.config.name}-{idx}"
                 item = json.loads(line)
                 yield key, {
-                    "input": item["input"],
-                    "context": item["context"],
-                    "answers": item["answers"],
-                    "length": item["length"],
-                    "dataset": item["dataset"],
-                    "language": item["language"],
-                    "_id": item["_id"],
-                    "all_classes": item["all_classes"],
+                    "input": item["input"] if "input" in item else "",
+                    "context": item["context"] if "context" in item else "",
+                    "answers": [item["answers"]] if isinstance(item["answers"], str)  else item["answers"] if "answers" in item else [],
+                    "length": item["length"] if "length" in item else 0,
+                    "dataset": item["dataset"] if "dataset" in item else "",
+                    "language": item["language"] if "language" in item else "",
+                    "_id": item["_id"] if "_id" in item else "",
+                    "all_classes": item["all_classes"] if "all_classes" in item else [],
                 }

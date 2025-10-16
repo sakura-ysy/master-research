@@ -1,7 +1,10 @@
 {
     "glm-4-9b-chat": 120000,
     "meta-llama-3-8b-instruct": 120000,
+    "fingpt-mt_llama3-8b_merged": 120000,
     "meta-llama-3.1-8b-instruct": 120000,
+    "toolace-2-llama-3.1-8b": 120000,
+    "evolcodellama-3.1-8b-instruct": 120000,
     "llama-3.1-8b-instruct": 120000,
     "llama-3.1-70b-instruct": 120000,
     "llama-3.3-70b-instruct": 120000,

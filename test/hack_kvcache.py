@@ -21,8 +21,8 @@ def check_world_size(v: str) -> int:
 
 def parse_args(args=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str.lower, default=None, choices=["llama2-7b-chat-4k", "meta-llama-3-8b-instruct", "meta-llama-3.1-8b-instruct", "longchat-v1.5-7b-32k", "xgen-7b-8k", "internlm-7b-8k", "chatglm2-6b", "chatglm2-6b-32k", "chatglm3-6b-32k", "vicuna-v1.5-7b-16k"])
-    parser.add_argument('--dataset', type=str.lower, nargs='+', default=["2wikimqa"], choices=["2wikimqa", "narrativeqa", "qasper", "multifieldqa_en", "multifieldqa_zh", "hotpotqa", "musique", "dureader", "gov_report", "qmsum", "multi_news", "vcsum", "trec", "triviaqa", "samsum", "lsht", "passage_count", "passage_retrieval_en", "passage_retrieval_zh", "lcc", "repobench-p"], help="Specify one or more datasets to evaluate")
+    parser.add_argument('--model', type=str.lower, default=None)
+    parser.add_argument('--dataset', type=str.lower, nargs='+', default=["2wikimqa"], help="Specify one or more datasets to evaluate")
     parser.add_argument('--world_size', type=check_world_size, default=torch.cuda.device_count(), help="Number of GPUs to use, must be 1 or a multiple of 2")
     parser.add_argument('--long_bench_ds_path', type=str, default="THUDM/LongBench", help="Path to the LongBench dataset if you have it locally")
     parser.add_argument('--e', action='store_true', help="Evaluate on LongBench-E")
@@ -64,9 +64,10 @@ def get_pred(rank, world_size, data, max_length, max_gen, prompt_format, dataset
     model, tokenizer = load_model_and_tokenizer(model2path[model_name], model_name, device)
     for json_obj in tqdm(data):
         prompt = prompt_format.format(**json_obj)
-        prompt = tokenizer.apply_chat_template([
-            {"role": "user", "content": prompt},
-        ], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+        # 注释掉 apply_chat_template，为了使不同的 model 输入一样，好去做 kvcache diff
+        # prompt = tokenizer.apply_chat_template([
+        #     {"role": "user", "content": prompt},
+        # ], tokenize=False, add_generation_prompt=True, enable_thinking=False)
         # truncate to fit max_length (we suggest truncate in the middle, since the left and right side may contain crucial instructions)
         tokenized_prompt = tokenizer(prompt, truncation=False, return_tensors="pt").input_ids[0]
         if "chatglm3" in model_name:
@@ -154,6 +155,9 @@ def load_model_and_tokenizer(path, model_name, device):
         model = model.to(device)
         model = model.bfloat16()
         tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
+    elif "qwen" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(device)
     model = model.eval()
     return model, tokenizer
 
@@ -180,7 +184,7 @@ if __name__ == '__main__':
         os.makedirs("kvcache")
 
     for dataset in datasets:
-        data = load_dataset(long_bench_ds_path, f"{dataset}_e", split='test')
+        data = load_dataset(long_bench_ds_path, f"{dataset}", split='test')
         if not os.path.exists(f"kvcache/{model_name}"):
             os.makedirs(f"kvcache/{model_name}")
         kv_out_dir = f"kvcache/{model_name}/{dataset}"

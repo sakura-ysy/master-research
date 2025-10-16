@@ -19,5 +19,6 @@
     "passage_retrieval_en": 32,
     "passage_retrieval_zh": 32,
     "lcc": 64,
-    "repobench-p": 64
+    "repobench-p": 64,
+    "evol-instruct-python-1k": 1024
 }
