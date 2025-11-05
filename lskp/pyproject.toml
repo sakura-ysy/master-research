@@ -1,0 +1,12 @@
+[project]
+name = "lskp"                         # pip 安装时的包名
+version = "0.1.0"
+description = "LoRA Sharing KVCache Pool"
+requires-python = ">=3.8"
+authors = [{ name = "yesiyuan", email = "2575633193@qq.com" }]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements/common.txt"] }
+
+[tool.setuptools.packages.find]
+exclude = ["integration*", "pybinding"]

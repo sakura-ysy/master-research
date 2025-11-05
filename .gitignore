@@ -1,6 +1,11 @@
 .vscode
 example/__pycache__
 example/kvcache
+example/pred
 tmp
 draw/qkv_3d_plots
 draw/diff_3d_plots
+lskp/lskp.egg-info
+lskp/build
+test
+**/**/__pycache__

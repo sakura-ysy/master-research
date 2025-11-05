@@ -2,11 +2,11 @@
 
 # simple dispatcher: first arg is the command (pred|eval), the rest are forwarded
 PYTHON=python3
-MODEL="Meta-Llama-3.1-8B-Instruct"
+MODEL="meta-llama-3.1-8b-instruct"
 LONG_BENCH_DS_PATH="/home/ysy/code/research/longbench_data"
 WORLD_SIZE=1
 # DATASET="evol-instruct-python-1k"
-DATASET="2wikimqa"
+DATASET="lcc"
 
 # if use TuneCache
 USE_TUNECACHE=1
@@ -62,7 +62,7 @@ case "$cmd" in
   eval)
       "$PYTHON" \
         $DEBUG_ARG \
-        tunecache_pred.py \
+        eval.py \
         --model "$MODEL" \
         "$@"
     ;;

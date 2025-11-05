@@ -56,13 +56,13 @@ def plot_tensor_3d(tensor, title="3D Tensor Visualization"):
 if __name__ == "__main__":
     # 生成一个示例 tensor，形状 [token, channel, hidden]
 
-    model1 = "Qwen2.5-7B-Instruct".lower()
+    model1 = "meta-llama-3.1-8b-instruct".lower()
     model2 = "evolcodellama-3.1-8b-instruct".lower()
     print("Comparing QKV tensors:", model1, "vs", model2)
 
-    dataset = "evol-instruct-python-1k"
-    tensor1_dir = f"/home/ysy/code/research/test/kvcache/{model1}/{dataset}"
-    tensor2_dir = f"/home/ysy/code/research/test/kvcache/{model2}/{dataset}"
+    dataset = "lcc"
+    tensor1_dir = f"/home/ysy/code/research/example/kvcache/{model1}/{dataset}"
+    tensor2_dir = f"/home/ysy/code/research/example/kvcache/{model2}/{dataset}"
     
     png_out_dir = "diff_3d_plots"
     os.makedirs(png_out_dir, exist_ok=True)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
       if not os.path.isdir(os.path.join(tensor2_dir, prompt1_dir)):
         print(f"Directory {prompt1_dir} not found in {tensor2_dir}, skipping.")
         continue
-      if prompt_cnt > 0:
+      if prompt_cnt > 4:
          break
       prompt_cnt += 1
       prompt1_dir_path = os.path.join(tensor1_dir, prompt1_dir)

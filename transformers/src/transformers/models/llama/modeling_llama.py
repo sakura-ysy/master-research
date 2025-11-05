@@ -228,23 +228,26 @@ class LlamaAttention(nn.Module):
         past_key_values: Optional[Cache] = None,
         cache_position: Optional[torch.LongTensor] = None,
         recompute_metadata: Optional[dict] = None,
-        old_kv: Optional[list[torch.Tensor]] = None,  # access to old key/value states for caching in generation
+        old_qkv: Optional[list[torch.Tensor]] = None,  # access to old key/value states for caching in generation
         **kwargs: Unpack[TransformersKwargs],
     ) -> tuple[torch.Tensor, torch.Tensor]:
         input_shape = hidden_states.shape[:-1]
         hidden_shape = (*input_shape, -1, self.head_dim)
-
-        torch.cuda.synchronize()
-        qkv_proj_start_time = time.perf_counter()
-        query_states = self.q_proj(hidden_states).view(hidden_shape).transpose(1, 2)
-        key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
-        value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
-        torch.cuda.synchronize()
-        qkv_proj_end_time = time.perf_counter()
-        global qkv_proj_cost, attn_cost
-        qkv_proj_cost = qkv_proj_end_time - qkv_proj_start_time
-
         is_prefill = hidden_states.shape[1] != 1
+
+        query_states = self.q_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+        if (
+            is_prefill and
+            recompute_metadata is not None
+            and recompute_metadata["use_TuneCache"] is True
+            and recompute_metadata["kv_done"] is True
+            and recompute_metadata["reuse_layers"][self.layer_idx] == 1
+        ):
+            key_states = old_qkv[1]
+            value_states = old_qkv[2]
+        else:
+            key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+            value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
 
         # only hack prefill
         if (
@@ -254,18 +257,18 @@ class LlamaAttention(nn.Module):
         ):
             self.hack_qkv = [query_states.clone(), key_states.clone(), value_states.clone()]  # hack to access key/value states for caching in generation
 
-        # if (
-        #     recompute_metadata is not None
-        #     and recompute_metadata["use_TuneCache"] is True
-        #     and recompute_metadata["kv_done"] is True
-        #     and recompute_metadata["reuse_layer"][self.layer_idx] == 1
-        # ):
-        #     # reuse kv from old_kv
-        #     key_states = old_kv[0]
-        #     value_states = old_kv[1]
-        # else:
-        #     key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
-        #     value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+        if (
+            recompute_metadata is not None
+            and recompute_metadata["use_TuneCache"] is True
+            and recompute_metadata["kv_done"] is True
+            and recompute_metadata["reuse_layers"][self.layer_idx] == 1
+        ):
+            # reuse kv from old_qkv
+            key_states = old_qkv[0]
+            value_states = old_qkv[1]
+        else:
+            key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+            value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
 
         cos, sin = position_embeddings
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
@@ -316,7 +319,7 @@ class LlamaDecoderLayer(GradientCheckpointingLayer):
         cache_position: Optional[torch.LongTensor] = None,
         position_embeddings: Optional[tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
         recompute_metadata: Optional[dict] = None,
-        old_kv: Optional[list[torch.Tensor]] = None,  # access to old key/value states for caching in generation
+        old_qkv: Optional[list[torch.Tensor]] = None,  # access to old key/value states for caching in generation
         **kwargs: Unpack[TransformersKwargs],
     ) -> torch.Tensor:
         residual = hidden_states
@@ -331,7 +334,7 @@ class LlamaDecoderLayer(GradientCheckpointingLayer):
             cache_position=cache_position,
             position_embeddings=position_embeddings,
             recompute_metadata=recompute_metadata,
-            old_kv=old_kv,
+            old_qkv=old_qkv,
             **kwargs,
         )
         hidden_states = residual + hidden_states
@@ -340,7 +343,6 @@ class LlamaDecoderLayer(GradientCheckpointingLayer):
         residual = hidden_states
 
         is_prefill = hidden_states.shape[1] != 1
-        global qkv_proj_cost, attn_cost, layernorm_cost, mlp_cost
 
         hidden_states = self.post_attention_layernorm(hidden_states)
         hidden_states = self.mlp(hidden_states)
@@ -383,12 +385,6 @@ class LlamaModel(LlamaPreTrainedModel):
         self.rotary_emb = LlamaRotaryEmbedding(config=config)
         self.gradient_checkpointing = False
 
-        self.old_kvs = [[None,None]] * len(self.layers)
-        self.recompute_metadata = {
-            "kv_done": False,
-            "use_TuneCache": False,
-            "reuse_layer": [0] * len(self.layers),  # 1 means the layer should reuse kv cache
-        }
         # Initialize weights and apply final processing
         self.post_init()
 
@@ -403,6 +399,8 @@ class LlamaModel(LlamaPreTrainedModel):
         inputs_embeds: Optional[torch.FloatTensor] = None,
         cache_position: Optional[torch.LongTensor] = None,
         use_cache: Optional[bool] = None,
+        old_qkvs: Optional[list[torch.Tensor]] = None,  # old key/value states in cache
+        recompute_metadata: Optional[dict] = None,  # metadata for TuneCache
         **kwargs: Unpack[TransformersKwargs],
     ) -> BaseModelOutputWithPast:
         if (input_ids is None) ^ (inputs_embeds is not None):
@@ -436,7 +434,6 @@ class LlamaModel(LlamaPreTrainedModel):
         position_embeddings = self.rotary_emb(hidden_states, position_ids)
 
         for idx, decoder_layer in enumerate(self.layers[: self.config.num_hidden_layers]):
-            old_kv = self.old_kvs[idx]
             hidden_states = decoder_layer(
                 hidden_states,
                 attention_mask=causal_mask,
@@ -444,8 +441,8 @@ class LlamaModel(LlamaPreTrainedModel):
                 past_key_values=past_key_values,
                 cache_position=cache_position,
                 position_embeddings=position_embeddings,
-                recompute_metadata=self.recompute_metadata,
-                old_kv=old_kv,
+                recompute_metadata=recompute_metadata,
+                old_qkv= old_qkvs[idx] if old_qkvs is not None else None,
                 **kwargs,
             )
 
@@ -470,6 +467,12 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
 
         # Initialize weights and apply final processing
         self.post_init()
+        self.old_qkvs = None
+        self.recompute_metadata = {
+            "kv_done": False,
+            "use_TuneCache": False,
+            "reuse_layers": None  # [0,0,1,...] 1 means the layer should reuse kv cache
+        }
 
     @can_return_tuple
     @auto_docstring
@@ -511,6 +514,8 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
             inputs_embeds=inputs_embeds,
             use_cache=use_cache,
             cache_position=cache_position,
+            old_qkvs=self.old_qkvs,
+            recompute_metadata=self.recompute_metadata,
             **kwargs,
         )
 

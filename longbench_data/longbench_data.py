@@ -119,7 +119,7 @@ class LongBench(datasets.GeneratorBasedBuilder):
         with open(filepath, encoding="utf-8") as f:
             for idx, line in enumerate(f):
                 
-                if idx > 10:
+                if idx > 100:
                     break
 
                 key = f"{self.config.name}-{idx}"

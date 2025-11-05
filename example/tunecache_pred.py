@@ -9,6 +9,7 @@ import random
 import argparse
 import torch.distributed as dist
 import torch.multiprocessing as mp
+from typing import Optional
 from utils import hash_prompt_sha256
 
 def check_world_size(v: str) -> int:
@@ -63,11 +64,11 @@ def get_pred(
     dataset: str,
     device: torch.device,
     model_name: str,
-    sender_model: str,
+    sender_model_name: Optional[str],
     model2path: dict,
     pred_out_path: str,
     dump_qkv: bool,
-    kv_out_dir: str,
+    qkv_out_dir: Optional[str] = None,
 ):
 
     """
@@ -82,14 +83,26 @@ def get_pred(
         dataset (str): Dataset name or identifier.
         device (torch.device): CUDA or CPU device.
         model_name (str): Model identifier.
-        sender_model (str): Secondary model used for communication.
+        sender_model_name (str): Secondary model used for communication.
         model2path (dict): Mapping from model name to checkpoint path.
         pred_out_path (str): Output path for prediction results.
         dump_qkv (bool): Whether to dump KV cache.
         kv_out_dir (str): Directory for KV cache outputs.
     """
-    device = torch.device(f'cuda')
+    device = torch.device(f'cuda:0')
     model, tokenizer = load_model_and_tokenizer(model2path[model_name], model_name, device)
+    model.config.architectures[0]
+    sender_model = None
+    sender_tokenizer = None
+    if use_tune_cache:
+        assert sender_model_name is not None, "Please specify sender_model when using tune cache."
+        # 默认使用两张卡，卡1 跑 sender model，卡0 跑 receiver model
+        assert torch.cuda.device_count() >= 2, "At least 2 GPUs are required when using tune cache."
+        sender_device = torch.device(f'cuda:1')
+        sender_model, sender_tokenizer = load_model_and_tokenizer(model2path[sender_model_name], sender_model_name, sender_device)
+        assert sender_model.config.architectures[0] == model.config.architectures[0], f"Model architecture mismatch: {sender_model.config.architectures[0]} vs {model.config.architectures[0]}"
+        assert type(sender_tokenizer) == type(tokenizer), f"Tokenizer type mismatch: {type(sender_tokenizer)} vs {type(tokenizer)}"
+        
     for json_obj in tqdm(data):
         prompt = prompt_format.format(**json_obj)
         prompt = tokenizer.apply_chat_template([
@@ -109,24 +122,57 @@ def get_pred(
                 input = prompt.to(device)
         else:
             input = tokenizer(prompt, truncation=False, return_tensors="pt").to(device)
-        
+
         context_length = input.input_ids.shape[-1]
-        if dataset == "samsum" or dataset == "2wikimqa": # prevent illegal output on samsum (model endlessly repeat "\nDialogue"), might be a prompting issue
-            output = model.generate(
-                **input,
-                max_new_tokens=max_gen,
-                do_sample=False,
-                temperature=None,
-                min_length=context_length+1,
-                eos_token_id=[tokenizer.eos_token_id, tokenizer.encode("\n", add_special_tokens=False)[-1]],
-            )[0]
-        else:
-            output = model.generate(
-                **input,
-                max_new_tokens=max_gen,
-                do_sample=False,
-                temperature=None,
-            )[0]
+
+        generate_args = dict(
+            max_new_tokens=max_gen,
+            do_sample=False,
+            temperature=None,
+            min_length=context_length + 1,
+            eos_token_id=[
+                tokenizer.eos_token_id,
+                tokenizer.encode("\n", add_special_tokens=False)[-1],
+            ],
+        )
+
+        # generate sender model's kvcache
+        if use_tune_cache:
+            recompute_metadata = {
+                "use_TuneCache": True,
+                "kv_done": False,
+            }
+            sender_model.recompute_metadata = recompute_metadata
+            sender_input = input.copy().to("cpu").to(sender_device)
+            _ = sender_model.generate(**(sender_input),**generate_args)[0]
+            llm_layers = sender_model.model.layers if hasattr(sender_model, 'model') else sender_model.layers
+
+            reuse_layers = [0] * len(llm_layers)
+            # 先尝试单层复用
+            reuse_layers[19] = 1
+
+            sender_cache = [[None, None, None] for _ in range(len(llm_layers))]
+            for j in range(len(llm_layers)):
+                if hasattr(llm_layers[j], 'self_attn') and hasattr(llm_layers[j].self_attn, 'hack_qkv') and reuse_layers[j] == 1:
+                    hack_qkv = llm_layers[j].self_attn.hack_qkv
+                    sender_cache[j][0] = hack_qkv[0].to("cpu").to(device)
+                    sender_cache[j][1] = hack_qkv[1].to("cpu").to(device)
+                    sender_cache[j][2] = hack_qkv[2].to("cpu").to(device)
+                    torch.cuda.synchronize(device)
+                else:
+                    del llm_layers[j].self_attn.hack_qkv
+
+        if use_tune_cache:
+            recompute_metadata = {
+                "use_TuneCache": True,
+                "kv_done": True,
+                "reuse_layers": reuse_layers,
+            }
+            model.recompute_metadata = recompute_metadata
+            model.old_qkvs = sender_cache
+
+        output = model.generate(**input, **generate_args)[0]
+
         pred = tokenizer.decode(output[context_length:], skip_special_tokens=True)
         pred = post_process(pred, model_name)
         with open(pred_out_path, "a", encoding="utf-8") as f:
@@ -136,16 +182,16 @@ def get_pred(
         if dump_qkv:
             hash_key = hash_prompt_sha256(prompt, bits=256, encoding="hex")
             llm_layers = model.model.layers if hasattr(model, 'model') else model.layers
-            os.makedirs(kv_out_dir,exist_ok=True)
+            os.makedirs(qkv_out_dir,exist_ok=True)
             for j in range(len(llm_layers)):
                 if hasattr(llm_layers[j], 'self_attn') and hasattr(llm_layers[j].self_attn, 'hack_qkv'):
                     hack_qkv = llm_layers[j].self_attn.hack_qkv
-                    key_out_dir = os.path.join(kv_out_dir, f"{hash_key}")
+                    key_out_dir = os.path.join(qkv_out_dir, f"{hash_key}")
                     os.makedirs(key_out_dir, exist_ok=True)
                     os.makedirs(os.path.join(key_out_dir, f"layer_{j}"), exist_ok=True)  # create layer_j
-                    torch.save(hack_qkv[0].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"key.pt"))
-                    torch.save(hack_qkv[1].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"value.pt"))
-                    torch.save(hack_qkv[2].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"query.pt"))
+                    torch.save(hack_qkv[0].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"query.pt"))
+                    torch.save(hack_qkv[1].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"key.pt"))
+                    torch.save(hack_qkv[2].cpu(), os.path.join(key_out_dir, f"layer_{j}", f"value.pt"))
 
     # dist.destroy_process_group()
 
@@ -211,12 +257,13 @@ if __name__ == '__main__':
             os.makedirs(f"pred/{model_name}")
         pred_out_path = f"pred/{model_name}/{dataset}.jsonl"
 
+        qkv_out_dir = None
         if dump_qkv:
             if not os.path.exists(f"kvcache/{model_name}"):
                 os.makedirs(f"kvcache/{model_name}")
-            kv_out_dir = f"kvcache/{model_name}/{dataset}"
-            if not os.path.exists(kv_out_dir):
-                os.mkdir(kv_out_dir)
+            qkv_out_dir = f"kvcache/{model_name}/{dataset}"
+            if not os.path.exists(qkv_out_dir):
+                os.mkdir(qkv_out_dir)
 
         prompt_format = dataset2prompt[dataset]
         max_gen = dataset2maxlen[dataset]
@@ -236,7 +283,7 @@ if __name__ == '__main__':
                 model2path,         # model2path
                 pred_out_path,      # out_path
                 dump_qkv,           # dump_qkv
-                kv_out_dir,         # kv_out_dir
+                qkv_out_dir,        # kv_out_dir
             ),
         )
 
